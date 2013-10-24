@@ -1,5 +1,6 @@
 package ru.fizteh.fivt.students.dzvonarev.filemap;
 
+<<<<<<< HEAD
 import ru.fizteh.fivt.students.dzvonarev.shell.CommandInterface;
 
 import java.io.IOException;
@@ -14,6 +15,14 @@ public class Get implements CommandInterface {
         while (str.indexOf(' ', spaceIndex + 1) == spaceIndex + 1) {
             ++spaceIndex;
         }
+=======
+import java.io.IOException;
+import java.util.HashMap;
+
+public class Get {
+
+    public static void getItem(String str, int spaceIndex) throws IOException {
+>>>>>>> 38f61f7ba6a6e3f4171e3e9c8ce606b57c1e3154
         if (str.indexOf(' ', spaceIndex + 1) != -1) {
             throw new IOException("get: wrong input");
         }

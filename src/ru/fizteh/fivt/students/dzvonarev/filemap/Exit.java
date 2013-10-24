@@ -1,5 +1,6 @@
 package ru.fizteh.fivt.students.dzvonarev.filemap;
 
+<<<<<<< HEAD
 import ru.fizteh.fivt.students.dzvonarev.shell.CommandInterface;
 
 import java.io.IOException;
@@ -15,6 +16,12 @@ public class Exit implements CommandInterface {
             System.exit(1);
         }
         System.exit(0);
+=======
+public class Exit {
+
+    public static void exitFileMap(int status) {
+        System.exit(status);
+>>>>>>> 38f61f7ba6a6e3f4171e3e9c8ce606b57c1e3154
     }
 
 }
