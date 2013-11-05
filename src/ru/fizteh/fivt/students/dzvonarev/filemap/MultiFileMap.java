@@ -1,7 +1,10 @@
 package ru.fizteh.fivt.students.dzvonarev.filemap;
 
+<<<<<<< HEAD:src/ru/fizteh/fivt/students/dzvonarev/filemap/MyTable.java
 import ru.fizteh.fivt.storage.strings.Table;
 
+=======
+>>>>>>> parent of 90eea02... Junit(without tests) v1:src/ru/fizteh/fivt/students/dzvonarev/filemap/MultiFileMap.java
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,8 +15,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class MyTable implements Table {
+public class MultiFileMap {
 
+<<<<<<< HEAD:src/ru/fizteh/fivt/students/dzvonarev/filemap/MyTable.java
     public class ValueNode {
         String oldValue;
         String newValue;
@@ -98,30 +102,74 @@ public class MyTable implements Table {
             return false;
         }
         return st1.equals(st2);
+=======
+    private static HashMap<String, HashMap<String, String>> multiFileMap;
+
+    private static String workingTable;   // "noTable" means we are not in table
+
+    public static String getWorkingTable() {
+        return workingTable;
     }
 
-    public void readFileMap() throws RuntimeException, IOException {
-        String[] dbDirs = (new File(tableName)).list();
-        if (dbDirs != null && dbDirs.length != 0) {
-            for (String dbDir : dbDirs) {
-                if (!isValidDir(dbDir)) {
-                    throw new RuntimeException("directory " + dbDir + " is not valid");
+    public static void changeWorkingTable(String newWorkingTable) {
+        workingTable = newWorkingTable;
+>>>>>>> parent of 90eea02... Junit(without tests) v1:src/ru/fizteh/fivt/students/dzvonarev/filemap/MultiFileMap.java
+    }
+
+    public static HashMap<String, HashMap<String, String>> getMultiFileMap() {
+        return multiFileMap;
+    }
+
+    public static void readMultiFileMap(String workingDir) throws IOException, RuntimeException {
+        changeWorkingTable("noTable");
+        multiFileMap = new HashMap<>();
+        File currDir = new File(workingDir);
+        if (currDir.exists() && currDir.isDirectory()) {
+            String[] tables = currDir.list();
+            if (tables != null && tables.length != 0) {
+                for (String table : tables) {
+                    File dirTable = new File(workingDir + File.separator + table);
+                    if (dirTable.isFile()) {
+                        continue;
+                    }
+                    String[] dbDirs = dirTable.list();
+                    if (dbDirs != null && dbDirs.length != 0) {
+                        HashMap<String, String> tempMap;
+                        tempMap = new HashMap<>();
+                        for (String dbDir : dbDirs) {
+                            if (!isValidDir(dbDir)) {
+                                throw new RuntimeException("directory " + dbDir + " is not valid");
+                            }
+                            File dbDirTable = new File(workingDir + File.separator + table + File.separator + dbDir);
+                            String[] dbDats = dbDirTable.list();
+                            if (dbDats == null || dbDats.length == 0) {
+                                throw new RuntimeException("reading directory: " + table + " is not valid");
+                            }
+                            for (String dbDat : dbDats) {
+                                String str = workingDir + File.separator + table + File.separator + dbDir + File.separator + dbDat;
+                                readFileMap(tempMap, str, dbDir, dbDat); // table -> all |"key"|"value"|
+                            }
+                        }
+                        multiFileMap.put(table, tempMap);
+                    }
                 }
-                File dbDirTable = new File(tableName + File.separator + dbDir);
-                String[] dbDats = dbDirTable.list();
-                if (dbDats == null || dbDats.length == 0) {
-                    throw new RuntimeException("reading directory: " + tableName + " is not valid");
-                }
-                for (String dbDat : dbDats) {
-                    String str = tableName + File.separator + dbDir + File.separator + dbDat;
-                    readMyFileMap(str, dbDir, dbDat);
+                for (String table : tables) {
+                    if (new File(workingDir + File.separator + table).isFile()) {
+                        continue;
+                    }
+                    ShellRemove.execute(table);
+                    if (!(new File(workingDir + File.separator + table)).mkdir()) {
+                        throw new IOException("exit: can't make " + table + " directory");
+                    }
                 }
             }
+        } else {
+            throw new RuntimeException("working directory is not valid");
         }
     }
 
-    /* READING FILEMAP */
-    public void readMyFileMap(String fileName, String dir, String file) throws IOException, RuntimeException {
+
+    public static void readFileMap(HashMap<String, String> fileMap, String fileName, String dir, String file) throws IOException, RuntimeException {
         RandomAccessFile fileReader = openFileForRead(fileName);
         long endOfFile = fileReader.length();
         long currFilePosition = fileReader.getFilePointer();
@@ -160,16 +208,7 @@ public class MyTable implements Table {
         closeFile(fileReader);
     }
 
-    public boolean keyIsValid(String key, String dir, String file) {
-        int b = key.getBytes()[0];
-        int nDirectory = Math.abs(b) % 16;
-        int nFile = Math.abs(b) / 16 % 16;
-        String rightDir = Integer.toString(nDirectory) + ".dir";
-        String rightFile = Integer.toString(nFile) + ".dat";
-        return (dir.equals(rightDir) && file.equals(rightFile));
-    }
-
-    public boolean isFilesInDirValid(String dirName) {
+    public static boolean isFilesInDirValid(String dirName) {
         File dir = new File(dirName);
         String[] file = dir.list();
         if (file == null || file.length == 0) {
@@ -189,7 +228,7 @@ public class MyTable implements Table {
         return true;
     }
 
-    public boolean isValidDir(String path) {
+    public static boolean isValidDir(String path) {
         File dir = new File(path);
         String[] file = dir.list();
         if (file == null || file.length == 0) {
@@ -210,7 +249,17 @@ public class MyTable implements Table {
         return true;
     }
 
-    public void writeInTable() throws IOException {
+    public static boolean keyIsValid(String key, String dir, String file) {
+        int b = key.getBytes()[0];
+        int nDirectory = Math.abs(b) % 16;
+        int nFile = Math.abs(b) / 16 % 16;
+        String rightDir = Integer.toString(nDirectory) + ".dir";
+        String rightFile = Integer.toString(nFile) + ".dat";
+        return (dir.equals(rightDir) && file.equals(rightFile));
+    }
+
+    public static void writeMap(HashMap<String, HashMap<String, String>> map, String table) throws IOException {
+        HashMap<String, String> fileMap = map.get(table);
         if (fileMap == null) {
             return;
         } else {
@@ -229,9 +278,9 @@ public class MyTable implements Table {
             int nFile = Math.abs(b) / 16 % 16;
             String rightDir = Integer.toString(nDirectory) + ".dir";
             String rightFile = Integer.toString(nFile) + ".dat";
-            String path = tableName +
+            String path = System.getProperty("fizteh.db.dir") + File.separator + table +
                     File.separator + rightDir + File.separator + rightFile;
-            String dir = tableName +
+            String dir = System.getProperty("fizteh.db.dir") + File.separator + table +
                     File.separator + rightDir;
             File file = new File(path);
             File fileDir = new File(dir);
@@ -249,12 +298,12 @@ public class MyTable implements Table {
         }
     }
 
-    public void writeInFile(String path, String key, String value) throws IOException {
-        RandomAccessFile fileWriter = openFileForWrite(path);
+    public static void writeInFile(String path, String key, String value) throws IOException {
+        RandomAccessFile fileWriter = MultiFileMap.openFileForWrite(path);
         fileWriter.skipBytes((int) fileWriter.length());
         try {
             if (key == null || value == null) {
-                closeFile(fileWriter);
+                MultiFileMap.closeFile(fileWriter);
                 throw new IOException("updating file: error in writing");
             }
             byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
@@ -266,11 +315,12 @@ public class MyTable implements Table {
         } catch (IOException e) {
             throw new IOException("updating file: error in writing");
         } finally {
-            closeFile(fileWriter);
+            MultiFileMap.closeFile(fileWriter);
         }
     }
 
-    public RandomAccessFile openFileForRead(String fileName) throws IOException {
+
+    public static RandomAccessFile openFileForRead(String fileName) throws IOException {
         RandomAccessFile newFile;
         try {
             newFile = new RandomAccessFile(fileName, "rw");
@@ -280,7 +330,7 @@ public class MyTable implements Table {
         return newFile;
     }
 
-    public RandomAccessFile openFileForWrite(String fileName) throws IOException {
+    public static RandomAccessFile openFileForWrite(String fileName) throws IOException {
         RandomAccessFile newFile;
         try {
             newFile = new RandomAccessFile(fileName, "rw");
@@ -290,7 +340,7 @@ public class MyTable implements Table {
         return newFile;
     }
 
-    public void closeFile(RandomAccessFile file) throws IOException {
+    public static void closeFile(RandomAccessFile file) throws IOException {
         try {
             file.close();
         } catch (IOException e) {
@@ -298,6 +348,7 @@ public class MyTable implements Table {
         }
     }
 
+<<<<<<< HEAD:src/ru/fizteh/fivt/students/dzvonarev/filemap/MyTable.java
     @Override
     public String getName() {
         return tableName.substring(tableName.lastIndexOf(File.separator) + 1, tableName.length());
@@ -373,4 +424,6 @@ public class MyTable implements Table {
         return count;
     }
 
+=======
+>>>>>>> parent of 90eea02... Junit(without tests) v1:src/ru/fizteh/fivt/students/dzvonarev/filemap/MultiFileMap.java
 }

@@ -10,18 +10,15 @@ import java.util.Vector;
 
 public class Main {
 
-    public static Vector<CommandInterface> getCommandObjects(MyTableProvider tableProvider) {
+    public static Vector<CommandInterface> getCommandObjects() {
         Vector<CommandInterface> arr = new Vector<>();
-        DataBasePut put = new DataBasePut(tableProvider);
-        DataBaseGet get = new DataBaseGet(tableProvider);
-        DataBaseRemove remove = new DataBaseRemove(tableProvider);
-        DataBaseExit exit = new DataBaseExit(tableProvider);
-        DataBaseUse use = new DataBaseUse(tableProvider);
-        DataBaseCreate create = new DataBaseCreate(tableProvider);
-        DataBaseDrop drop = new DataBaseDrop(tableProvider);
-        DataBaseSize size = new DataBaseSize(tableProvider);
-        DataBaseCommit commit = new DataBaseCommit(tableProvider);
-        DataBaseRollback rollback = new DataBaseRollback(tableProvider);
+        Put put = new Put();
+        Get get = new Get();
+        Remove remove = new Remove();
+        Exit exit = new Exit();
+        Use use = new Use();
+        Create create = new Create();
+        Drop drop = new Drop();
         arr.add(put);
         arr.add(get);
         arr.add(remove);
@@ -29,9 +26,6 @@ public class Main {
         arr.add(use);
         arr.add(create);
         arr.add(drop);
-        arr.add(size);
-        arr.add(commit);
-        arr.add(rollback);
         return arr;
     }
 
@@ -44,9 +38,6 @@ public class Main {
         arr.add("use");
         arr.add("create");
         arr.add("drop");
-        arr.add("size");
-        arr.add("commit");
-        arr.add("rollback");
         return arr;
     }
 
@@ -69,7 +60,6 @@ public class Main {
 
 
     public static void main(String[] arr) {
-        MyTableProvider tableProvider = null;
         try {
             String path = "";
             if (!isGetPropertyValid(System.getProperty("fizteh.db.dir"))) {
@@ -78,8 +68,7 @@ public class Main {
             } else {
                 path = Shell.getAbsPath(System.getProperty("fizteh.db.dir"));
             }
-            MyTableProviderFactory tableProviderFactory = new MyTableProviderFactory();
-            tableProvider = tableProviderFactory.create(path);
+            MultiFileMap.readMultiFileMap(path);
         } catch (IOException e) {
             System.out.println(e.getMessage());
             System.exit(1);
@@ -87,7 +76,7 @@ public class Main {
             System.out.println(e.getMessage());
         }
         Vector<String> cmdName = getCommandNames();
-        Vector<CommandInterface> cmd = getCommandObjects(tableProvider);
+        Vector<CommandInterface> cmd = getCommandObjects();
         Shell shell = new Shell(cmdName, cmd);
         if (arr.length == 0) {
             shell.interactiveMode();

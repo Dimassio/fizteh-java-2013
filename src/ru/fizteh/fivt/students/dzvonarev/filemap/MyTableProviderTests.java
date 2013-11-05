@@ -17,9 +17,9 @@ public class MyTableProviderTests {
 
     @Test
     public void testSameInstanceGetCreate() {
-        Assert.assertEquals(provider.createTable("instance"), provider.getTable("instance"));
-        Assert.assertEquals(provider.getTable("instance"), provider.getTable("instance"));
-        provider.removeTable("instance");
+        Assert.assertEquals(provider.createTable("example"), provider.getTable("example"));
+        Assert.assertEquals(provider.getTable("example"), provider.getTable("example"));
+        provider.removeTable("example");
     }
 
 }

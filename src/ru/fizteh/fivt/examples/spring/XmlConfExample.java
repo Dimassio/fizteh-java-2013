@@ -2,10 +2,10 @@ package ru.fizteh.fivt.examples.spring;
 
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 /**
  * @author Dmitriy Komanov (spacelord)
  */
+
 public class XmlConfExample {
     public static void main(String[] args) {
         AbstractXmlApplicationContext applicationContext =
@@ -15,3 +15,4 @@ public class XmlConfExample {
         algorithm.performAction(args.length == 0 ? "abc" : args[0]);
     }
 }
+
